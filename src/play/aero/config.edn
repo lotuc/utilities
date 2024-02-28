@@ -1,0 +1,12 @@
+{:a "a"
+ :home #env HOME
+ :or-v #or [#env ANYTHING #env HOME]
+ :join-v #join ["hello" " world"]
+ :profile-v #profile {:default "default-v"
+                      :dev "dev-v"}
+ :merge-v #merge [{:a "a"} {:b "b"}]
+ :include0 #include "play/aero/include0.edn"
+ :ref-include0-debug #ref [:include0 :debug]
+
+ :env!-home #env! HOME
+ :env!-abc #env! ABC}

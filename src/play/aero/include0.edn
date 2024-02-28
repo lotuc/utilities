@@ -1,0 +1,5 @@
+{:debug #boolean #or [#env DEBUG "true"]
+ :webserver
+ {:port #long #or [#env PORT 8080]
+  :factor #double #or [#env FACTOR "4.2"]
+  :mode #keyword #or [#env MODE "dev"]}}
