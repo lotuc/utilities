@@ -1,10 +1,10 @@
-(ns play.aero.core
+(ns fiddle.aero.core
   (:require
    [aero.core :as aero]
    [clojure.java.io :as io]
    [hyperfiddle.rcf :refer [tests]]))
 
-(def f (io/resource "play/aero/config.edn"))
+(def f (io/resource "fiddle/aero/config.edn"))
 (def home (System/getenv "HOME"))
 
 (defmethod aero/reader 'env!

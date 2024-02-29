@@ -1,0 +1,6 @@
+{:ring-web-common #include "ring-web-common.edn"
+
+ :server/http
+ {:port #long #or [#env PORT 4242]
+  :host #or [#env HTTP_HOST]
+  :handler #ig/ref :handler/ring}}

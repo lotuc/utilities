@@ -1,18 +1,11 @@
 {:system/env
- #profile {:dev  :dev
+ #profile {:dev :dev
            :test :test
            :prod :prod}
 
- :server/http
- {:port    #long #or [#env PORT 4242]
-  :host    #or [#env HTTP_HOST "0.0.0.0"]
-  :handler #ig/ref :handler/ring}
-
  :handler/ring
  {:router                #ig/ref :router/core
-  :api-path              "/api"
   :cookie-secret         #or [#env COOKIE_SECRET "KBGWBPCCQRUQXCKB"]
-  :middleware            #ring/middleware {:customized-option "value"}
   ;; from ring.middleware.defaults. anti-forgery `false` by default because services may not require it
   :site-defaults-config  {:params    {:urlencoded true
                                       :multipart  true
@@ -32,18 +25,41 @@
                           :responses {:not-modified-responses true
                                       :absolute-redirects     true
                                       :content-types          true
-                                      :default-charset        "utf-8"}}}
+                                      :default-charset        "utf-8"}}
+
+  ;; customized handler middleware using customized aero reader
+  ;; :middleware #ring/middleware {}
+
+  ;; This will be passed into `swagger-ui/create-swagger-ui-handler`
+  ;; https://cljdoc.org/d/metosin/reitit/0.7.0-alpha7/doc/ring/swagger-support
+  :swagger-ui {:path "/api-docs"
+               :config {:persistAuthorization true
+                        :urls [{:name "openapi" :url "/api/openapi.json"}
+                               {:name "swagger" :url "/api/swagger.json"}]
+                        :urls.primaryName "openapi"}}}
 
  :reitit.routes/api
  {:base-path "/api"
-  :routes    #ig/refset :reitit.routes.api/routes
-  :env       #ig/ref :system/env}
+  :env #ig/ref :system/env
+
+  ;; some built-in routes
+  ;; - :swagger creates `base-path`/swagger.json
+  ;; - :openapi creates `base-path`/openapi.json
+  ;; - :health creates `base-path`/health
+  :built-in-routes {:swagger {:info {:title "Swagger doc"}}
+                    :openapi {:info {:title "openAPI doc" :version "0.0.1"}}
+                    :health {}}
+
+  ;; other customized routes
+  :routes #ig/refset :reitit.routes.api/routes
+
+  ;; customized route data
+  :route-data {:swagger {:id :reitit.routes/api}
+               :openapi {:id :reitit.routes/api}}}
 
  :router/routes
  {:routes #ig/refset :reitit/routes}
 
  :router/core
  {:routes #ig/ref :router/routes
-  :env #ig/ref :system/env}
-
- :reitit.routes.api/hello {}}
+  :env #ig/ref :system/env}}

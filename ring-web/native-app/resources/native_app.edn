@@ -1,0 +1,12 @@
+{:ring-web-common #include "ring-web-common.edn"
+
+ :handler/ring
+ {:swagger-ui {:path "/api-docs"
+               :config {:persistAuthorization true
+                        :urls [{:name "openapi" :url "/api/openapi.json"}]
+                        :urls.primaryName "openapi"}}}
+
+ :server/http-kit
+ {:port #long #or [#env PORT 4242]
+  :host #or [#env HTTP_HOST]
+  :handler #ig/ref :handler/ring}}

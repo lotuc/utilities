@@ -1,11 +1,13 @@
 (ns lotuc.ring-web.middleware
   (:require
    [clojure.tools.logging :as log]
-   [reitit.ring.middleware.exception :as exception]
    [luminus-transit.time :as time]
    [muuntaja.core :as muuntaja]
+   [reitit.ring.middleware.exception :as exception]
    [ring.middleware.defaults :as defaults]
    [ring.middleware.session.cookie :as cookie]))
+
+(set! *warn-on-reflection* true)
 
 (defn handler [message status exception request]
   (when (>= status 500)
@@ -13,7 +15,7 @@
     (log/error exception))
   {:status status
    :body   {:message   message
-            :exception (.getClass exception)
+            :exception (.getClass ^Throwable exception)
             :data      (ex-data exception)
             :uri       (:uri request)}})
 

@@ -1,4 +1,4 @@
-(ns play.ring-web.core
+(ns fiddle.ring-web.sample1
   (:require
    [aero.core :as aero]
    [clojure.java.io :as io]
@@ -6,7 +6,7 @@
    [integrant.core :as ig]
    [integrant.repl]
    [kit.edge.server.undertow]
-   [lotuc.ring-web.core]
+   [lotuc.ring-web.core :refer [system-config]]
    [ring.util.http-response :as http-response]))
 
 (defmethod aero/reader 'ring/middleware
@@ -17,15 +17,13 @@
         (throw (ex-info (str "ring/middleware not found")
                         {:aero-opts aero-opts})))))
 
-(def dev-config
-  {:profile :dev
-   :ring/middleware (fn [h opts]
-                      (log/infof ":customized-option %s - site-defaults-config %s"
-                                 (:customized-option opts) (:site-defaults-config opts))
-                      h)})
-
-(integrant.repl/set-prep!
- #(aero/read-config (io/resource "play/ring_web/config.edn") dev-config))
+(defn middleware
+  "Checkout sample1.edn `:handler/ring`/`:middleware` for how this is
+  configured."
+  [h {:keys [customized-option site-defaults-config]}]
+  (log/infof ":customized-option %s - site-defaults-config %s"
+             customized-option site-defaults-config)
+  h)
 
 ;;; custom api routes
 
@@ -39,4 +37,14 @@
    ["/hello" {:get (fn [_] (http-response/ok {:message "Hello, World!"}))}]])
 
 (comment
-  (integrant.repl/go))
+  ;; customized handler middleware with customized midddleware reader
+  (integrant.repl/set-prep!
+   #(system-config (io/resource "fiddle/ring_web/sample1.edn")
+                   {:profile :dev :ring/middleware middleware}))
+
+  ;; start/restart the system
+  (integrant.repl/go)
+
+  ;; Checkout this API
+  ;; - curl http://localhost:4242/api/hello
+  )

@@ -1,0 +1,7 @@
+{:paths ["src" "resources"]
+ :deps {lotuc.ring-web/ring-web {:local/root ".."}
+        io.github.kit-clj/kit-http-kit {:mvn/version "1.0.3"}
+        ch.qos.logback/logback-classic {:mvn/version "1.5.1"}}
+ :aliases
+ {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.5" :git/sha "24f2894"}}
+          :ns-default build}}}

@@ -1,0 +1,7 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": "ring-web-common.edn"}
+    ]
+  }
+}
