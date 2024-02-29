@@ -1,10 +1,16 @@
-{:paths ["src" "ring-web/src" "ring-web/resources" "ring-web/test"]
+{:paths ["src" "src-cljs" "resources"
+         "ring-web/src" "ring-web/resources" "ring-web/test"]
  :deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}
         com.lambdaisland/classpath {:mvn/version "0.5.48"}
         com.taoensso/encore {:mvn/version "3.86.0"}
         integrant/integrant {:mvn/version "0.8.1"}
         integrant/repl {:mvn/version "0.3.3"}
         aero/aero {:mvn/version "1.1.6"}
+
+        ;; https://clojars.org/thheller/shadow-cljs/versions/2.27.4
+        thheller/shadow-cljs {:mvn/version "2.27.4"}
+        ; com.google.guava/guava {:mvn/version "30.1-jre"}
+        com.google.guava/guava {:mvn/version "33.0.0-jre"}
 
         io.github.kit-clj/kit-core {:mvn/version "1.0.6" :exclusions [aero/aero integrant/integrant org.clojure/tools.logging ch.qos.logback/logback-classic]}
         io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}

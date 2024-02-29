@@ -3,6 +3,8 @@
 !.clj-kondo/config.edn
 !.lsp/config.edn
 target
+node_modules
+.shadow-cljs
 
 # Created by https://www.toptal.com/developers/gitignore/api/clojure,macos,emacs,vim,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=clojure,macos,emacs,vim,java
