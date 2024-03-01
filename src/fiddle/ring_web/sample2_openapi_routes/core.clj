@@ -1,4 +1,4 @@
-(ns fiddle.ring-web.sample2
+(ns fiddle.ring-web.sample2-openapi-routes.core
   (:require
    [clojure.java.io :as io]
    [integrant.core :as ig]
@@ -7,11 +7,7 @@
    [lotuc.ring-web.core :refer [system-config]]
    [ring.util.http-response :as http-response]))
 
-;;; custom api routes
-
-(derive :reitit.routes.api/math :reitit.routes.api/routes)
-
-(defn- get-math-add [{:keys [parameters]}]
+(defn- get-math-add [{:keys [parameters session cookies]}]
   (let [{:keys [x y]} (:query parameters)]
     (http-response/ok {:total (+ x y)})))
 
@@ -31,6 +27,11 @@
 
 (defn- post-math-op [{:keys [parameters]}]
   (http-response/ok {:res (apply-math-op (:body parameters))}))
+
+;;; why this?
+;;;
+;;; search for `:reitit.routes.api/routes` in `ring-web-common.edn` for details.
+(derive :reitit.routes.api/math :reitit.routes.api/routes)
 
 (defmethod ig/init-key :reitit.routes.api/math
   [_ {:keys [base-path]}]
@@ -59,7 +60,8 @@
 
 (comment
   (integrant.repl/set-prep!
-   #(system-config (io/resource "fiddle/ring_web/sample2.edn") {:profile :dev}))
+   #(system-config (io/resource "fiddle/ring_web/sample2_openapi_routes/system.edn")
+                   {:profile :dev}))
 
   ;; start/restart the system
   (integrant.repl/go)

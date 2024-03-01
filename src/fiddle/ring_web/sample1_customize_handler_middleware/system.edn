@@ -1,0 +1,19 @@
+{:ring-web-common #include "ring-web-common.edn"
+
+ :server/http
+ {:port #long #or [#env PORT 4242]
+  :host #or [#env HTTP_HOST "0.0.0.0"]
+  :handler #ig/ref :handler/ring}
+
+ :handler/ring
+ {:middleware #sample1/middleware {:hello "world"}
+  :swagger-ui {:path "/api-docs"
+               :config {:persistAuthorization true
+                        :urls [{:name "openapi" :url "/api/openapi.json"}]
+                        :urls.primaryName "openapi"}}}
+
+ :reitit.routes/api
+ {:built-in-routes {:openapi {:info {:title "openAPI doc" :version "0.0.1"}
+                              ;; basic authentication for API doc
+                              :middleware [#middleware/basic-authentication {:user->pass {"user" "pass"}}]}
+                    :health {}}}}

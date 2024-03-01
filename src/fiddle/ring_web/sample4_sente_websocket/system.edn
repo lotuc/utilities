@@ -1,0 +1,15 @@
+{:ring-web-common #include "ring-web-common.edn"
+
+ :handler/ring {:middleware #sample3/middleware {}}
+
+ :sente/chsk-server {:adapter :undertow
+                     :server-option #sample3/sente-server-option {}
+                     :chsk-router-event-msg-handler #sample3/senete-msg-handler {}}
+
+ :sente/chsk-route {:chsk-server #ig/ref :sente/chsk-server}
+ :sente/chsk-message-handler {:chsk-server #ig/ref :sente/chsk-server}
+
+ :server/http
+ {:port #long #or [#env PORT 4242]
+  :host #or [#env HTTP_HOST]
+  :handler #ig/ref :handler/ring}}

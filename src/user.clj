@@ -24,4 +24,4 @@
   (def reset integrant.repl/reset)
   (def go integrant.repl/go)
   (def halt integrant.repl/halt)
-  (def system integrant.repl.state/system))
+  (defn system [& ks] (get-in integrant.repl.state/system ks)))

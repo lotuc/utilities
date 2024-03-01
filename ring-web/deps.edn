@@ -6,6 +6,7 @@
         aero/aero {:mvn/version "1.1.6"}
 
         io.github.kit-clj/kit-core {:mvn/version "1.0.6" :exclusions [aero/aero integrant/integrant org.clojure/tools.logging ch.qos.logback/logback-classic]}
+        com.taoensso/sente {:mvn/version "1.19.2" :exclusions [com.taoensso/encore]}
 
         ;; Routing
         metosin/reitit {:mvn/version "0.7.0-alpha7" :exclusions [metosin/ring-swagger-ui]}
