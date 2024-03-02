@@ -1,4 +1,4 @@
-# Native APP
+# Graal native building sample
 
 ```sh
 clj -T:build exe

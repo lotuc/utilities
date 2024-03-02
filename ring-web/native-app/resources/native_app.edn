@@ -1,10 +1,17 @@
 {:ring-web-common #include "ring-web-common.edn"
 
  :handler/ring
- {:swagger-ui {:path "/api-docs"
+ {:middleware #app/middleware {}
+  :swagger-ui {:path "/api-docs"
                :config {:persistAuthorization true
                         :urls [{:name "openapi" :url "/api/openapi.json"}]
                         :urls.primaryName "openapi"}}}
+
+ :sente/chsk-server {:adapter :http-kit
+                     :server-option #app/sente-server-option {}
+                     :chsk-router-event-msg-handler #app/senete-msg-handler {}}
+ :sente/chsk-route {:chsk-server #ig/ref :sente/chsk-server}
+ :sente/chsk-message-handler {:chsk-server #ig/ref :sente/chsk-server}
 
  :server/http-kit
  {:port #long #or [#env PORT 4242]
