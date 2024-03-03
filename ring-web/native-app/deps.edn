@@ -1,9 +1,9 @@
 {:paths ["src" "resources"]
  :deps {lotuc.ring-web/ring-web {:local/root ".."}
-        com.taoensso/encore {:mvn/version "3.86.0"}
+        com.taoensso/encore {:mvn/version "3.88.0"}
         ring-cors/ring-cors {:mvn/version "0.1.13"}
         io.github.kit-clj/kit-http-kit {:mvn/version "1.0.3"}
-        ch.qos.logback/logback-classic {:mvn/version "1.5.1"}}
+        ch.qos.logback/logback-classic {:mvn/version "1.5.2"}}
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.9.5" :git/sha "24f2894"}}
           :ns-default build}}}

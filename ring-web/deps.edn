@@ -30,7 +30,7 @@
  :aliases
  {:test {:extra-paths ["test"]
          :extra-deps {io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
-                      ch.qos.logback/logback-classic {:mvn/version "1.5.1"}
+                      ch.qos.logback/logback-classic {:mvn/version "1.5.2"}
                       io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
          :main-opts ["-m" "cognitect.test-runner"]
          :exec-fn cognitect.test-runner.api/test}}}
