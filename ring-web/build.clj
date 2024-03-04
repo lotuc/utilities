@@ -18,16 +18,19 @@
 (defn jar [_]
   (println "\nwriting pom ...")
   (b/write-pom
-   {:class-dir class-dir
+   {:src-pom "pom0.xml"
     :lib lib
     :version version
-    :basis basis
+    :target "target"
     :src-dirs ["src"]
     :resource-dirs ["resources"]
-    :scm {:url "https://github.com/lotuc/ring-web"
-          :connection "scm:git:git://github.com/lotuc/ring-web.git"
-          :developerConnection "scm:git:ssh://git@github.com/lotuc/ring-web.git"
+    :class-dir class-dir
+    :basis (b/create-basis nil)
+    :scm {:url "https://github.com/lotuc/utilities/tree/main/ring-web"
+          :connection "scm:git:git://github.com/lotuc/utilities.git"
+          :developerConnection "scm:git:ssh://git@github.com/lotuc/utilities.git"
           :tag (b/git-process {:git-args "rev-parse HEAD"})}})
+  (io/copy (io/file pom-file) (io/file "pom.xml"))
 
   (println "\ncopy source & resources ...")
   (b/copy-dir {:src-dirs ["src" "resources"] :target-dir class-dir})
@@ -41,8 +44,6 @@
   (clean _)
 
   (jar _)
-
-  (io/copy (io/file pom-file) (io/file "pom.xml"))
 
   (-> {:installer (or (:installer _) :local)
        :sign-releases? false
