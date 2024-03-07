@@ -3,7 +3,8 @@
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]
    [integrant.core :as ig]
-   [taoensso.sente :as sente]))
+   [taoensso.sente :as sente]
+   [taoensso.sente.interfaces :as sente.interfaces]))
 
 (def adapter-packages
   {:http-kit "taoensso.sente.server-adapters.http-kit"
@@ -51,7 +52,14 @@
 
 (defmethod ig/halt-key! :sente/chsk-server
   [k {:keys [ch-recv] :as chsk-server}]
-  ;; https://github.com/taoensso/sente/blob/8c73be5db24f260a01cc4159159997342cb414ff/wiki/3-FAQ.md?plain=1#L92
   (log/infof "halt %s" k)
+  (let [conns_ (get-in chsk-server [:private :conns_])]
+    (doseq [[_ v] (:ws @conns_)]
+      (doseq [[ch] (vals v)]
+        ;; try cleanup websocket connections for later resuming
+        (try (sente.interfaces/sch-close! ch)
+             (catch Throwable _)))))
+
+  ;; https://github.com/taoensso/sente/blob/8c73be5db24f260a01cc4159159997342cb414ff/wiki/3-FAQ.md?plain=1#L92
   (when ch-recv
     (async/close! ch-recv)))
