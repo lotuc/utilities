@@ -26,6 +26,8 @@
   (:import
    [java.util.concurrent.atomic AtomicReferenceArray]))
 
+(set! *warn-on-reflection* true)
+
 (def ^{:const true :tag 'long} FN-IDX 0)
 (def ^{:const true :tag 'long} STATE-IDX 1)
 (def ^{:const true :tag 'long} VALUE-IDX 2)
@@ -1051,3 +1053,9 @@
 
 (defn run-state-machine [state]
   ((aget-object state FN-IDX) state))
+
+(defn copy-state-machine [^AtomicReferenceArray state]
+  (let [s (AtomicReferenceArray. (.length state))]
+    (doseq [i (range (.length state))]
+      (.set s i (.get state i)))
+    s))
