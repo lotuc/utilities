@@ -1,9 +1,7 @@
 (ns fiddle.ioc-macros.sample02-delimited-continuation
   (:require
    [hyperfiddle.rcf :as rcf]
-   [lotuc.clj.ioc-macros :as ioc])
-  (:import
-   [java.util.concurrent.atomic AtomicReferenceArray]))
+   [lotuc.clj.ioc-macros :as ioc]))
 
 ;;; https://github.com/leonoel/cloroutine/blob/master/doc/04-delimited-continuations.md
 
@@ -11,9 +9,7 @@
   (assert nil "yield used not in (async ...) block"))
 
 (defn build-continuation [state blk]
-  (let [s (AtomicReferenceArray. (.length state))]
-    (doseq [i (range (.length state))]
-      (.set s i (.get state i)))
+  (let [s (ioc/copy-state-machine state)]
     (fn [v]
       (ioc/aset-all! s ioc/STATE-IDX blk ioc/VALUE-IDX v)
       (ioc/run-state-machine s)
