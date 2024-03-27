@@ -1,0 +1,2 @@
+{:hooks {:macroexpand {lotuc.clj.ioc-macros/gen-plan
+                       lotuc.clj.ioc-macros-hook/gen-plan}}}
