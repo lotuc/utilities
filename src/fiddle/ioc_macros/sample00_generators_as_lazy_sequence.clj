@@ -1,4 +1,4 @@
-(ns fiddle.ioc-macros.sample0-generators-as-lazy-sequence
+(ns fiddle.ioc-macros.sample00-generators-as-lazy-sequence
   (:require
    [lotuc.clj.ioc-macros :as ioc]
    [hyperfiddle.rcf :as rcf]))
