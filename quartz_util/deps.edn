@@ -1,0 +1,2 @@
+{:paths ["src"]
+ :deps {org.quartz-scheduler/quartz {:mvn/version "2.3.2"}}}

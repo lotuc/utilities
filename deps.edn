@@ -1,6 +1,7 @@
 {:paths ["fiddle/src" "fiddle/resources"
          "ring-web/src" "ring-web/resources" "ring-web/test"
-         "ioc_macros/src" "ioc_macros/resources" "ioc_macros/test"]
+         "ioc_macros/src" "ioc_macros/resources" "ioc_macros/test"
+         "quartz_util/src"]
  :deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}
         com.lambdaisland/classpath {:mvn/version "0.5.48"}
         com.taoensso/encore {:mvn/version "3.88.0"}
@@ -9,6 +10,8 @@
         aero/aero {:mvn/version "1.1.6"}
         missionary/missionary {:mvn/version "b.34"}
         org.clojure/core.async {:mvn/version "1.6.681"}
+
+        org.quartz-scheduler/quartz {:mvn/version "2.3.2"}
 
         ;; https://clojars.org/thheller/shadow-cljs/versions/2.27.5
         thheller/shadow-cljs {:mvn/version "2.27.5"}
