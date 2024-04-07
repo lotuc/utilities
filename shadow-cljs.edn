@@ -1,11 +1,11 @@
 {:deps true
 
- :dev-http {4244 "resources/public"}
+ :dev-http {4244 "fiddle/resources/public"}
 
  :builds
  {:app
   {:target :browser
-   :output-dir "resources/public/js"
-   :devtools {:watch-dir "resources/public"}
+   :output-dir "fiddle/resources/public/js"
+   :devtools {:watch-dir "fiddle/resources/public"}
    :modules {:main {:entries [user]}}
    :compiler-options {:warnings {:redef false}}}}}
