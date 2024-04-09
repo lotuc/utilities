@@ -1,2 +1,13 @@
 {:paths ["src"]
- :deps {org.quartz-scheduler/quartz {:mvn/version "2.3.2"}}}
+ :deps {org.quartz-scheduler/quartz {:mvn/version "2.3.2"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.kit-clj/kit-undertow {:mvn/version "1.0.6"}
+                      ch.qos.logback/logback-classic {:mvn/version "1.5.2"}
+                      io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}
+
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}}}

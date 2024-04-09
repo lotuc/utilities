@@ -1,5 +1,8 @@
 # Quartz utilities
 
+[![Clojars Project](https://img.shields.io/clojars/v/org.lotuc/quartz-util.svg)](https://clojars.org/org.lotuc/quartz-util)
+[![Clojars Project](https://img.shields.io/clojars/v/org.lotuc/quartz-util.svg?include_prereleases)](https://clojars.org/org.lotuc/quartz-util)
+
 Prior art (and where some code snippets comes from)
 - [Quartzite](https://github.com/michaelklishin/quartzite)
 - [twarc](https://github.com/prepor/twarc)

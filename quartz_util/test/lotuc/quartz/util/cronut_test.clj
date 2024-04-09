@@ -44,7 +44,7 @@
           :startTime   #inst "2019-01-01T00:00:00.000-00:00"
           :endTime     #inst "2019-02-01T00:00:00.000-00:00"}
          (-> (cronut/base-trigger-builder
-              {:identity    ["trigger-two" "test"]
+              {:key    ["test" "trigger-two"]
                :description "test trigger"
                :start       #inst "2019-01-01T00:00:00.000-00:00"
                :end         #inst "2019-02-01T00:00:00.000-00:00"
