@@ -1,7 +1,7 @@
 {:paths ["fiddle/src" "fiddle/resources" "classes"
          "ring-web/src" "ring-web/resources" "ring-web/test"
          "ioc_macros/src" "ioc_macros/resources" "ioc_macros/test"
-         "quartz_util/src"]
+         "quartz_util/src" "quartz_util/test"]
  :deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}
         com.lambdaisland/classpath {:mvn/version "0.5.48"}
         com.taoensso/encore {:mvn/version "3.88.0"}
@@ -13,6 +13,7 @@
 
         org.quartz-scheduler/quartz {:mvn/version "2.3.2"}
         org.quartz-scheduler/quartz-jobs {:mvn/version "2.3.2"}
+        com.mysql/mysql-connector-j {:mvn/version "8.3.0"}
 
         ;; https://clojars.org/thheller/shadow-cljs/versions/2.27.5
         thheller/shadow-cljs {:mvn/version "2.27.5"}
