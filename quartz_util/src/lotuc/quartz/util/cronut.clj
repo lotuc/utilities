@@ -1,9 +1,10 @@
 (ns lotuc.quartz.util.cronut
+  (:require
+   [lotuc.quartz.util.key :refer [trigger-key]])
   (:import
    [java.util TimeZone]
    [org.quartz
     CronScheduleBuilder
-    JobKey
     SimpleScheduleBuilder
     TriggerBuilder
     TriggerKey]))
@@ -32,11 +33,6 @@
 
 ;;; The original source comes from: https://github.com/factorhouse/cronut
 ;;; Keeps only the trigger builder
-
-(defn- trigger-key [k]
-  (cond (string? k) (TriggerKey. k)
-        (vector? k) (TriggerKey. (first k) (second k))
-        :else (do (assert (instance? JobKey k)) k)))
 
 (defn base-trigger-builder
   "Provide a base trigger-builder from configuration"

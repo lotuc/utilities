@@ -1,6 +1,7 @@
 (ns lotuc.quartz.util.job
   (:require
-   [lotuc.quartz.util.conversion :as cnv])
+   [lotuc.quartz.util.conversion :as cnv]
+   [lotuc.quartz.util.key :refer [job-key]])
   (:import
    [org.quartz
     DisallowConcurrentExecution
@@ -9,11 +10,6 @@
     PersistJobDataAfterExecution]))
 
 (set! *warn-on-reflection* true)
-
-(defn- job-key [k]
-  (cond (string? k) (JobKey. k)
-        (vector? k) (JobKey. (first k) (second k))
-        :else (do (assert (instance? JobKey k)) k)))
 
 (defn- base-job-builder
   [{:keys [key type description durability requests-recovery data-map]}]

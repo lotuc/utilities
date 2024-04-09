@@ -1,17 +1,21 @@
-(ns lotuc.quartz.util.core
+(ns lotuc.quartz.util
   (:require
    [lotuc.quartz.util.cronut :as cronut]
-   [lotuc.quartz.util.job :as util.job])
+   [lotuc.quartz.util.job :as util.job]
+   [lotuc.quartz.util.listener :as util.listener]
+   [lotuc.quartz.util.scheduler :as util.scheduler]
+   [lotuc.quartz.util.twarc :as twarc])
   (:import
    [org.quartz
     Job
     JobBuilder
     JobKey
+    JobListener
+    Matcher
     Scheduler
     Trigger
     TriggerBuilder
-    TriggerKey]
-   [org.quartz.impl StdSchedulerFactory]))
+    TriggerKey]))
 
 (set! *warn-on-reflection* true)
 
@@ -55,32 +59,17 @@
 (defn check-trigger-exists [^Scheduler scheduler key]
   (.checkExists scheduler ^TriggerKey (trigger-key key)))
 
-(def ^{:private true :doc "Taken from "} quartz-default-options
-  {:scheduler.rmi.export false
-   :scheduler.rmi.proxy false
-   :threadPool.class "org.quartz.simpl.SimpleThreadPool"
-   :threadPool.threadCount 10
-   :threadPool.threadPriority 5
-   :threadPool.threadsInheritContextClassLoaderOfInitializingThread true
-   :jobStore.misfireThreshold 60000
-   :jobStore.class "org.quartz.simpl.RAMJobStore"})
-
 (defn make-scheduler
-  ([] (make-scheduler {}))
-  ([properties] (make-scheduler properties {}))
-  ([properties options]
-   (let [n (get options :name (str (random-uuid)))
-         properties' (-> (merge quartz-default-options properties)
-                         (assoc :scheduler.instanceName n))
-         ^java.util.Properties p
-         (->> properties'
-              (#(let [p (java.util.Properties.)]
-                  (doseq [[k v] %
-                          :let [k (if (keyword? k)
-                                    (str "org.quartz." (name k))
-                                    (str k))
-                                v (str v)]]
-                    (.setProperty p k v))
-                  p)))
-         factory (StdSchedulerFactory. p)]
-     (.getScheduler factory))))
+  ([] (util.scheduler/make-scheduler {}))
+  ([properties] (util.scheduler/make-scheduler properties {}))
+  ([properties options] (util.scheduler/make-scheduler properties options)))
+
+(defn build-matcher ^Matcher [spec]
+  (if (instance? Matcher spec) spec (twarc/matcher spec)))
+
+(defn build-listener [spec]
+  (if (instance? JobListener spec) spec (util.listener/make-listener spec)))
+
+(defn add-job-listener [^Scheduler scheduler listener matcher]
+  (-> (.getListenerManager scheduler)
+      (.addJobListener ^JobListener (build-listener listener) (build-matcher matcher))))

@@ -1,8 +1,15 @@
 (ns lotuc.quartz.util.twarc
+  (:require
+   [lotuc.quartz.util.key :refer [generic-key job-key trigger-key]])
   (:import
-   [java.util UUID]
-   [org.quartz JobKey TriggerKey]
-   [org.quartz.impl StdSchedulerFactory]))
+   [org.quartz.impl.matchers
+    AndMatcher
+    EverythingMatcher
+    GroupMatcher
+    KeyMatcher
+    NameMatcher
+    NotMatcher
+    OrMatcher]))
 
 ;; Copyright © 2015 Andrew Rudenko
 ;;
@@ -11,30 +18,54 @@
 ;;
 ;; https://github.com/prepor/twarc
 
-(defn- uuid [] (-> (UUID/randomUUID) str))
+(defn- make-fn-matcher [match-fn]
+  (reify org.quartz.Matcher
+    (^boolean isMatch [_ ^org.quartz.utils.Key k] (match-fn (.getGroup k) (.getName k)))
+    (equals [this other] (= this other))
+    (hashCode [_] (hash [match-fn ::matcher]))))
 
-(defn- ->properties
-  [m]
-  (let [p (java.util.Properties.)]
-    (doseq [[k v] m]
-      (.setProperty p (name k) (str v)))
-    p))
+(defn matcher
+  "Constructor of Quartz matchers. Can be used in Liteners, for example.
 
-(defn job-key
-  ([group name] (JobKey. name group))
-  ([name] (JobKey. name)))
+  Supported matchers:
 
-(defn trigger-key
-  ([group name] (TriggerKey. name group))
-  ([name] (TriggerKey. name)))
+  {:fn matcher-fn} in which matcher-fn is (fn [group name] boolean)
 
-(defn make-scheduler
-  ([] (make-scheduler {}))
-  ([properties] (make-scheduler properties {}))
-  ([properties options]
-   (let [n (get options :name (uuid))
-         factory (StdSchedulerFactory.
-                  (->> (assoc properties :scheduler.instanceName n)
-                       (map (juxt (comp #(str "org.quartz." (name %)) first) second))
-                       (->properties)))]
-     (.getScheduler factory))))
+  {:key [\"some group\" \"some identity\"] :scope scope} where scope is :job or :trigger or nil
+
+  {:name [:contains \"foo\"]}
+
+  {:group [:contains \"foo\"]}
+
+  {:and [matcher1 matcher2 ... matcherN]}
+
+  {:or [matcher1 matcher2 ... matcherN]}
+
+  {:not matcher}
+
+  :everything
+
+  :contains in :name and :group matchers also can be :equals, :ends-with and :starts-with "
+  [spec]
+  (cond
+    (:fn spec) (make-fn-matcher (:fn spec))
+    (:and spec) (reduce #(AndMatcher/and (matcher %1) (matcher %2)) (:and spec))
+    (:or spec) (reduce #(OrMatcher/or (matcher %1) (matcher %2)) (:or spec))
+    (:not spec) (NotMatcher/not (matcher (:not spec)))
+    (:group spec) (let [s (second (:group spec))]
+                    (case (first (:group spec))
+                      :contains (GroupMatcher/groupContains s)
+                      :ends-with (GroupMatcher/groupEndsWith s)
+                      :equals (GroupMatcher/groupEquals s)
+                      :starts-with (GroupMatcher/groupStartsWith s)))
+    (:name spec) (let [s (second (:name spec))]
+                   (case (first (:name spec))
+                     :contains (NameMatcher/nameContains s)
+                     :ends-with (NameMatcher/nameEndsWith s)
+                     :equals (NameMatcher/nameEquals s)
+                     :starts-with (NameMatcher/nameStartsWith s)))
+    (:key spec) (KeyMatcher/keyEquals (case (:scope spec)
+                                        :job (job-key (:key spec))
+                                        :trigger (trigger-key (:key spec))
+                                        (generic-key (:key spec))))
+    (= :everything spec) (EverythingMatcher/allJobs)))
