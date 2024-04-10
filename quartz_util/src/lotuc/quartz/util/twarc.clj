@@ -2,6 +2,7 @@
   (:require
    [lotuc.quartz.util.key :refer [generic-key job-key trigger-key]])
   (:import
+   [org.quartz JobKey TriggerKey]
    [org.quartz.impl.matchers
     AndMatcher
     EverythingMatcher
@@ -18,9 +19,13 @@
 ;;
 ;; https://github.com/prepor/twarc
 
-(defn- make-fn-matcher [match-fn]
+(defn- make-fn-matcher [match-fn & [scope]]
   (reify org.quartz.Matcher
-    (^boolean isMatch [_ ^org.quartz.utils.Key k] (match-fn (.getGroup k) (.getName k)))
+    (^boolean isMatch [_ ^org.quartz.utils.Key k]
+      (and (cond (= scope :job) (instance? JobKey k)
+                 (= scope :trigger) (instance? TriggerKey k)
+                 :else (nil? scope))
+           (match-fn (.getGroup k) (.getName k))))
     (equals [this other] (= this other))
     (hashCode [_] (hash [match-fn ::matcher]))))
 
@@ -29,7 +34,7 @@
 
   Supported matchers:
 
-  {:fn matcher-fn} in which matcher-fn is (fn [group name] boolean)
+  {:fn matcher-fn :scope scope} in which matcher-fn is (fn [group name] boolean)
 
   {:key [\"some group\" \"some identity\"] :scope scope} where scope is :job or :trigger or nil
 
@@ -48,7 +53,7 @@
   :contains in :name and :group matchers also can be :equals, :ends-with and :starts-with "
   [spec]
   (cond
-    (:fn spec) (make-fn-matcher (:fn spec))
+    (:fn spec) (make-fn-matcher (:fn spec) (:scope spec))
     (:and spec) (reduce #(AndMatcher/and (matcher %1) (matcher %2)) (:and spec))
     (:or spec) (reduce #(OrMatcher/or (matcher %1) (matcher %2)) (:or spec))
     (:not spec) (NotMatcher/not (matcher (:not spec)))

@@ -6,6 +6,7 @@
    [org.quartz
     DisallowConcurrentExecution
     JobBuilder
+    JobExecutionContext
     JobKey
     PersistJobDataAfterExecution]))
 
@@ -21,34 +22,31 @@
     (some? durability) (.storeDurably (boolean durability))
     (some? requests-recovery) (.requestRecovery (boolean requests-recovery))))
 
+(defn- run-job! [stateful? ^JobExecutionContext ctx]
+  (let [f (.. ctx (getJobDetail) (getJobDataMap) (get "fn"))
+        f' (resolve (symbol f))
+        d (-> (.getMergedJobDataMap ctx)
+              (cnv/from-job-data)
+              (dissoc "fn"))
+        r (f' ctx d)]
+    (when (map? r)
+      (when (contains? r :result)
+        (.setResult ctx (:result r)))
+      ;; stateful job may modify the Job's data map
+      (when (and stateful? (contains? r :data-map))
+        (.. ctx (getJobDetail) (getJobDataMap) (clear))
+        (.. ctx (getJobDetail) (getJobDataMap) (putAll (cnv/to-job-data (:data-map r))))))
+    ;; make sure we don't lose "fn"
+    (.. ctx (getJobDetail) (getJobDataMap) (put "fn" f))))
+
 (deftype StatelessJob []
   org.quartz.Job
-  (execute [_ ctx]
-    (let [f (.. ctx (getJobDetail) (getJobDataMap) (get "fn"))
-          f' (resolve (symbol f))
-          d (-> (.getMergedJobDataMap ctx)
-                (cnv/from-job-data)
-                (dissoc "fn"))
-          r (f' d)]
-      (.setResult ctx r))))
+  (execute [_ ctx] (run-job! false ctx)))
 
 (deftype ^{DisallowConcurrentExecution true
            PersistJobDataAfterExecution true} StatefulJob []
   org.quartz.Job
-  (execute [_ ctx]
-    (let [f (.. ctx (getJobDetail) (getJobDataMap) (get "fn"))
-          f' (resolve (symbol f))
-          d (-> (.getMergedJobDataMap ctx)
-                (cnv/from-job-data)
-                (dissoc "fn"))
-          r (f' ctx d)]
-      (when (contains? r :result)
-        (.setResult ctx (:result r)))
-      (when (contains? r :data-map)
-        (.. ctx (getJobDetail) (getJobDataMap) (clear))
-        (.. ctx (getJobDetail) (getJobDataMap) (putAll (cnv/to-job-data (:data-map r)))))
-      ;; make sure we don't lose "fn"
-      (.. ctx (getJobDetail) (getJobDataMap) (put "fn" f)))))
+  (execute [_ ctx] (run-job! true ctx)))
 
 (defn job-builder [{:keys [type stateful stateless data-map] :as config}]
   {:pre [(or (class? type)

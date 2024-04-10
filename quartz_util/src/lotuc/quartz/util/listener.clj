@@ -2,7 +2,7 @@
   (:import
    [org.quartz JobListener SchedulerListener TriggerListener]))
 
-(defmulti make-listener :type)
+(defmulti make-listener :scope)
 
 (defmethod make-listener :job
   [{:keys [name job-execution-vetoed job-to-be-executed job-was-executed]}]

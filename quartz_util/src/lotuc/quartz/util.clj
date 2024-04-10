@@ -13,9 +13,11 @@
     JobListener
     Matcher
     Scheduler
+    SchedulerListener
     Trigger
     TriggerBuilder
-    TriggerKey]))
+    TriggerKey
+    TriggerListener]))
 
 (set! *warn-on-reflection* true)
 
@@ -70,6 +72,33 @@
 (defn build-listener [spec]
   (if (instance? JobListener spec) spec (util.listener/make-listener spec)))
 
-(defn add-job-listener [^Scheduler scheduler listener matcher]
-  (-> (.getListenerManager scheduler)
-      (.addJobListener ^JobListener (build-listener listener) (build-matcher matcher))))
+(defn add-listener
+  ([^Scheduler scheduler {:keys [scope matcher] :as listener-spec}]
+   {:pre [(#{:job :trigger :scheduler} scope)]}
+   (if (= :scheduler scope)
+     (add-listener scheduler :scheduler listener-spec)
+     (if matcher
+       (add-listener scheduler scope listener-spec matcher)
+       (add-listener scheduler scope listener-spec))))
+  ([^Scheduler scheduler listener-scope listener]
+   {:pre [(#{:job :trigger :scheduler} listener-scope)]}
+   (let [m (.getListenerManager scheduler)
+         l (build-listener listener)]
+     (case listener-scope
+       :job (.addJobListener m ^JobListener l)
+       :trigger (.addTriggerListener m ^TriggerListener l)
+       :scheduler (.addSchedulerListener m ^SchedulerListener l))
+     l))
+  ([^Scheduler scheduler listener-scope listener matcher]
+   {:pre [(#{:job :trigger} listener-scope)]}
+   (let [m (.getListenerManager scheduler)
+         l (build-listener listener)]
+     (if (sequential? matcher)
+       (let [^java.util.List matchers (map build-matcher listener)]
+         (case listener-scope
+           :job (.addJobListener m ^JobListener l matchers)
+           :trigger (.addTriggerListener m ^TriggerListener l matchers)))
+       (let [^Matcher matcher' (build-matcher matcher)]
+         (case listener-scope
+           :job (.addJobListener m ^JobListener l matcher')
+           :trigger (.addTriggerListener m ^TriggerListener l matcher')))))))
