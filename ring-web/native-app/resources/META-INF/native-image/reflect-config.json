@@ -1,0 +1,225 @@
+[
+  {
+    "name": "lotuc.quartz.util.job.StatefulJob",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "lotuc.quartz.util.job.StatefulJobBeanInfo"
+  },
+  {
+    "name": "lotuc.quartz.util.job.StatefulJobCustomizer"
+  },
+  {
+    "name": "lotuc.quartz.util.job.StatefulJobInTx"
+  },
+  {
+    "name": "lotuc.quartz.util.job.StatelessJob"
+  },
+  {
+    "name": "lotuc.quartz.util.job.StatelessJobInTx"
+  },
+  {
+    "name": "org.quartz.CronScheduleBuilder"
+  },
+  {
+    "name": "org.quartz.DisallowConcurrentExecution"
+  },
+  {
+    "name": "org.quartz.ExecuteInJTATransaction"
+  },
+  {
+    "name": "org.quartz.Job",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "org.quartz.JobBuilder"
+  },
+  {
+    "name": "org.quartz.JobDataMap"
+  },
+  {
+    "name": "org.quartz.JobExecutionContext"
+  },
+  {
+    "name": "org.quartz.JobExecutionException"
+  },
+  {
+    "name": "org.quartz.JobKey"
+  },
+  {
+    "name": "org.quartz.JobListener"
+  },
+  {
+    "name": "org.quartz.Matcher"
+  },
+  {
+    "name": "org.quartz.PersistJobDataAfterExecution"
+  },
+  {
+    "name": "org.quartz.Scheduler"
+  },
+  {
+    "name": "org.quartz.SchedulerListener"
+  },
+  {
+    "name": "org.quartz.SimpleScheduleBuilder"
+  },
+  {
+    "name": "org.quartz.Trigger"
+  },
+  {
+    "name": "org.quartz.TriggerBuilder"
+  },
+  {
+    "name": "org.quartz.TriggerKey"
+  },
+  {
+    "name": "org.quartz.TriggerListener"
+  },
+  {
+    "name": "org.quartz.impl.StdScheduler",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "shutdown",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "org.quartz.impl.StdSchedulerFactory"
+  },
+  {
+    "name": "org.quartz.impl.matchers.AndMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.EverythingMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.GroupMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.KeyMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.NameMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.NotMatcher"
+  },
+  {
+    "name": "org.quartz.impl.matchers.OrMatcher"
+  },
+  {
+    "name": "org.quartz.simpl.CascadingClassLoadHelper",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "org.quartz.simpl.RAMJobStore",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "setInstanceId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setInstanceName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setMisfireThreshold",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.quartz.simpl.RAMJobStoreBeanInfo"
+  },
+  {
+    "name": "org.quartz.simpl.RAMJobStoreCustomizer"
+  },
+  {
+    "name": "org.quartz.simpl.SimpleThreadPool",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "setInstanceId",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setInstanceName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setThreadCount",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setThreadPriority",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setThreadsInheritContextClassLoaderOfInitializingThread",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.quartz.simpl.SimpleThreadPoolBeanInfo"
+  },
+  {
+    "name": "org.quartz.simpl.SimpleThreadPoolCustomizer"
+  },
+  {
+    "name": "org.quartz.spi.JobStore",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "org.quartz.spi.ThreadPool",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "org.quartz.utils.ConnectionProvider"
+  },
+  {
+    "name": "org.quartz.utils.DBConnectionManager"
+  },
+  {
+    "name": "org.quartz.utils.Key"
+  }
+]

@@ -4,7 +4,8 @@
    [kit.edge.server.http-kit]
    [lotuc.ring-web.core :as core]
    [lotuc.ring-web.sente-server]
-   [ring.util.response :as response])
+   [ring.util.response :as response]
+   [lotuc.ring-web.quartz-tasks])
   (:gen-class))
 
 ;;; handling swagger static resources.

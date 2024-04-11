@@ -13,6 +13,8 @@
  :sente/chsk-route {:chsk-server #ig/ref :sente/chsk-server}
  :sente/chsk-message-handler {:chsk-server #ig/ref :sente/chsk-server}
 
+ :quartz/scheduler {}
+
  :server/http-kit
  {:port #long #or [#env PORT 4242]
   :host #or [#env HTTP_HOST]
