@@ -77,6 +77,9 @@
     (= :everything spec) (EverythingMatcher/allJobs)))
 
 (extend-protocol p/->Matcher
+  clojure.lang.Keyword
+  (->matcher [this] (matcher this))
+
   clojure.lang.PersistentArrayMap
   (->matcher [this] (matcher this))
 

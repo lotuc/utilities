@@ -11,65 +11,32 @@ Prior art (and where some code snippets comes from)
 # Usage
 
 ```clojure
-(ns fiddle.quartz.util-example01.core
-  (:require
-   [lotuc.quartz.util :as qu])
-  (:import
-   [java.util Date]
-   [org.quartz JobExecutionContext]))
+(require '[lotuc.quartz.util :refer [make-scheduler schedule-job add-listener]])
 
-(defn job-fn [^JobExecutionContext ctx data-map]
-  (Thread/sleep 100)
-  (println (with-out-str
-             (print (str "[" (.. ctx (getJobDetail) (getKey)) "]"))
-             (print "[stateful] Hello Quartz!" data-map (Date.))))
-  {:result "some-result"
-   ;; for stateful job, this will replace the Job's data map
-   ;; if you want to modify the Job's data map with `ctx`, leave this out
-   :data-map (update data-map "count" (fnil inc 0))})
+(def sched (make-scheduler))
 
-(def grp "group1")
-(def next-job (let [!n (atom 0)] #(str "job-" (swap! !n inc))))
-(def next-trigger (let [!n (atom 0)] #(str "trigger-" (swap! !n inc))))
-(def job-1 (next-job))
+(defn job-fn [^org.quartz.JobExecutionContext _ctx data-map]
+  (println "[job-fn] " data-map)
+  {:data-map (update data-map "count" (fnil inc 0))
+   :result (data-map "count")})
 
-;;; build scheduler
-(defonce sched (qu/make-scheduler {:threadPool.threadCount 4}))
+(schedule-job sched
+              {:key ::job0 :stateful `job-fn
+               :data-map {:count 0}}
+              {:key ::trigger0
+               :type :simple :interval 1e3 :repeat 2})
 
-(.clear sched)
+(defn listener-on [scope {:keys [type] :as m}]
+  (println "[listener] " scope " " type " " (keys m)))
 
-(qu/schedule-job sched
-                 {:key [grp job-1] :stateless `job-fn}
-                 {:key [grp (next-trigger)]
-                  ;; run 1 & repeat 1 (total 2)
-                  :type :simple :interval 1e3 :repeat 1})
-
-(qu/schedule-job sched
-                 {:key [grp (next-job)] :stateful `job-fn
-                  ;; count from 5
-                  :data-map {"count" 5}}
-                 {:key [grp (next-trigger)]
-                  ;; run 1 & repeat 3 (total 4)
-                  :type :simple :interval 1e3 :repeat 3})
-
-(defn- listener-fn [{:keys [type context] :as m}]
-  (println m)
-  (when (= type :job-was-executed)
-    ;; schedule another job on `job-1` executed
-    (qu/schedule-job (.getScheduler context)
-                     {:key [grp (next-job)] :stateless `job-fn
-                      :data-map {"from" "job1-listener"
-                                 "result" (.getResult context)}}
-                     {:key [grp (next-trigger)]
-                      :type :simple :interval 1e3 :repeat 1})))
-
-(qu/add-listener sched
-                 {:scope :job
-                  :name "job1-listener"
-                  :listener-fn listener-fn
-                  ;; the listener matches job-1
-                  :matcher {:fn (fn [group-name name] (and (= group-name grp) (= name job-1)))
-                            :scope :job}})
+(doseq [scope [:job :trigger :scheduler]]
+  (add-listener
+   sched
+   (cond-> {:scope scope
+            :name (str (name scope) "-job0-listener")
+            :listener-fn (partial listener-on scope)}
+     (not= scope :scheduler)
+     (assoc :matcher :everything))))
 
 (.start sched)
 ```

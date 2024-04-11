@@ -33,8 +33,10 @@
       (listener-fn {:trigger trigger :type :trigger-fired
                     :context context}))
     (vetoJobExecution [_ trigger context]
-      (listener-fn {:trigger trigger :type :veto-job-execution
-                    :context context}))
+      (if-some [v (listener-fn {:trigger trigger :type :veto-job-execution
+                                :context context})]
+        (boolean v)
+        false))
     (triggerComplete [_ trigger context misfire-code]
       (listener-fn {:trigger trigger :type :trigger-complete
                     :context context :misfire-code misfire-code}))
