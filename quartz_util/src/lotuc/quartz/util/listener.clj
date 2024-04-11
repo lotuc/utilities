@@ -5,67 +5,83 @@
 (defmulti make-listener :scope)
 
 (defmethod make-listener :job
-  [{:keys [name job-execution-vetoed job-to-be-executed job-was-executed]}]
+  [{:keys [name listener-fn]}]
   (reify JobListener
     (getName [_] name)
     (jobExecutionVetoed [_ context]
-      (when job-execution-vetoed (job-execution-vetoed context)))
+      (listener-fn {:context context :type :job-execution-vetoed}))
     (jobToBeExecuted [_ context]
-      (when job-to-be-executed (job-to-be-executed context)))
+      (listener-fn {:context context :type :job-to-be-executed}))
     (jobWasExecuted [_ context exc]
-      (when job-was-executed (job-was-executed context exc)))))
+      (listener-fn {:context context :type :job-was-executed :exception exc}))))
 
 (defmethod make-listener :trigger
-  [{:keys [name trigger-fired veto-job-execution trigger-misfired trigger-complete]}]
+  [{:keys [name listener-fn]}]
   (reify TriggerListener
     (getName [_] name)
     (triggerFired [_ trigger context]
-      (when trigger-fired (trigger-fired trigger context)))
+      (listener-fn {:trigger trigger :type :trigger-fired
+                    :context context}))
     (vetoJobExecution [_ trigger context]
-      (when veto-job-execution (veto-job-execution trigger context)))
-    (triggerMisfired [_ trigger]
-      (when trigger-misfired (trigger-misfired trigger)))
+      (listener-fn {:trigger trigger :type :veto-job-execution
+                    :context context}))
     (triggerComplete [_ trigger context misfire-code]
-      (when trigger-complete (trigger-complete trigger context misfire-code)))))
+      (listener-fn {:trigger trigger :type :trigger-complete
+                    :context context :misfire-code misfire-code}))
+    (triggerMisfired [_ trigger]
+      (listener-fn {:trigger trigger :type :trigger-misfired}))))
 
 (defmethod make-listener :scheduler
-  [{:keys [name
-           job-scheduled
-           job-unscheduled
-           trigger-finalized
-           trigger-paused
-           triggers-paused
-           trigger-resumed
-           triggers-resumed
-           job-added
-           job-deleted
-           job-paused
-           jobs-paused
-           jobs-resumed
-           scheduler-error
-           scheduler-in-standby-mode
-           scheduler-started
-           scheduler-starting
-           scheduler-shutdown
-           scheduler-shuttingdown
-           scheduling-data-cleared]}]
+  [{:keys [name listener-fn]}]
   (reify SchedulerListener
-    (jobScheduled [_ trigger] (when job-scheduled (job-scheduled trigger)))
-    (jobUnscheduled [_ trigger-key] (when job-unscheduled (job-unscheduled trigger-key)))
-    (triggerFinalized [_ trigger] (when trigger-finalized (trigger-finalized trigger)))
-    (triggerPaused [_ trigger-key] (when trigger-paused (trigger-paused trigger-key)))
-    (triggersPaused [_ trigger-group] (when triggers-paused (triggers-paused trigger-group)))
-    (triggerResumed [_ trigger-key] (when trigger-resumed (trigger-resumed trigger-key)))
-    (triggersResumed [_ trigger-group] (when triggers-resumed (triggers-resumed trigger-group)))
-    (jobAdded [_ job-detail] (when job-added (job-added job-detail)))
-    (jobDeleted [_ job-key] (when job-deleted (job-deleted job-key)))
-    (jobPaused [_ job-key] (when job-paused (job-paused job-key)))
-    (jobsPaused [_ job-group] (when jobs-paused (jobs-paused job-group)))
-    (jobsResumed [_ job-group] (when jobs-resumed (jobs-resumed job-group)))
-    (schedulerError [_ msg cause] (when scheduler-error (scheduler-error msg cause)))
-    (schedulerInStandbyMode [_] (when scheduler-in-standby-mode (scheduler-in-standby-mode)))
-    (schedulerStarted [_] (when scheduler-started (scheduler-started)))
-    (schedulerStarting [_] (when scheduler-starting (scheduler-starting)))
-    (schedulerShutdown [_] (when scheduler-shutdown (scheduler-shutdown)))
-    (schedulerShuttingdown [_] (when scheduler-shuttingdown (scheduler-shuttingdown)))
-    (schedulingDataCleared [_] (when scheduling-data-cleared (scheduling-data-cleared)))))
+    (jobScheduled [_ trigger]
+      (listener-fn {:type :job-scheduled
+                    :trigger trigger}))
+    (triggerFinalized [_ trigger]
+      (listener-fn {:type :trigger-finalized
+                    :trigger trigger}))
+    (jobUnscheduled [_ trigger-key]
+      (listener-fn {:type :job-unscheduled
+                    :trigger-key trigger-key}))
+    (triggerPaused [_ trigger-key]
+      (listener-fn {:type :trigger-paused
+                    :trigger-key trigger-key}))
+    (triggersPaused [_ trigger-group]
+      (listener-fn {:type :triggers-paused
+                    :trigger-group trigger-group}))
+    (triggerResumed [_ trigger-key]
+      (listener-fn {:type :trigger-resumed
+                    :trigger-key trigger-key}))
+    (triggersResumed [_ trigger-group]
+      (listener-fn {:type :triggers-resumed
+                    :trigger-group trigger-group}))
+    (jobAdded [_ job-detail]
+      (listener-fn {:type :job-added
+                    :job-detail job-detail}))
+    (jobDeleted [_ job-key]
+      (listener-fn {:type :job-deleted
+                    :job-key job-key}))
+    (jobPaused [_ job-key]
+      (listener-fn {:type :job-paused
+                    :job-key job-key}))
+    (jobsPaused [_ job-group]
+      (listener-fn {:type :jobs-paused
+                    :job-group job-group}))
+    (jobsResumed [_ job-group]
+      (listener-fn {:type :jobs-resumed
+                    :job-group job-group}))
+    (schedulerError [_ msg cause]
+      (listener-fn {:type :scheduler-error
+                    :msg msg :cause cause}))
+    (schedulerInStandbyMode [_]
+      (listener-fn {:type :scheduler-in-standby-mode}))
+    (schedulerStarted [_]
+      (listener-fn {:type :scheduler-started}))
+    (schedulerStarting [_]
+      (listener-fn {:type :scheduler-starting}))
+    (schedulerShutdown [_]
+      (listener-fn {:type :scheduler-shutdown}))
+    (schedulerShuttingdown [_]
+      (listener-fn {:type :scheduler-shuttingdown}))
+    (schedulingDataCleared [_]
+      (listener-fn {:type :scheduling-data-cleared}))))

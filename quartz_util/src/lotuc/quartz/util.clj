@@ -70,7 +70,11 @@
   (if (instance? Matcher spec) spec (twarc/matcher spec)))
 
 (defn build-listener [spec]
-  (if (instance? JobListener spec) spec (util.listener/make-listener spec)))
+  {:pre [(or (map? spec)
+             (instance? JobListener spec)
+             (instance? TriggerListener spec)
+             (instance? SchedulerListener spec))]}
+  (if (map? spec) (util.listener/make-listener spec) spec))
 
 (defn add-listener
   ([^Scheduler scheduler {:keys [scope matcher] :as listener-spec}]

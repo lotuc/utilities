@@ -39,19 +39,20 @@
                   ;; run 1 & repeat 3 (total 4)
                   :type :simple :interval 1e3 :repeat 3})
 
-(defn- on-job-1-executed [ctx _]
-  ;; schedule another job on `job-1` executed
-  (qu/schedule-job (.getScheduler ctx)
-                   {:key [grp (next-job)] :stateless `job-fn
-                    :data-map {"from" "job1-listener"
-                               "result" (.getResult ctx)}}
-                   {:key [grp (next-trigger)]
-                    :type :simple :interval 1e3 :repeat 1}))
+(defn- listener-fn [{:keys [type context] :as m}]
+  (when (= type :job-was-executed)
+    ;; schedule another job on `job-1` executed
+    (qu/schedule-job (.getScheduler context)
+                     {:key [grp (next-job)] :stateless `job-fn
+                      :data-map {"from" "job1-listener"
+                                 "result" (.getResult context)}}
+                     {:key [grp (next-trigger)]
+                      :type :simple :interval 1e3 :repeat 1})))
 
 (qu/add-listener sched
                  {:scope :job
                   :name "job1-listener"
-                  :job-was-executed on-job-1-executed
+                  :listener-fn listener-fn
                   ;; the listener matches job-1
                   :matcher {:fn (fn [group-name name] (and (= group-name grp) (= name job-1)))
                             :scope :job}})
