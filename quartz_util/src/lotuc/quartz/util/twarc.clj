@@ -1,8 +1,8 @@
 (ns lotuc.quartz.util.twarc
   (:require
-   [lotuc.quartz.util.key :refer [generic-key job-key trigger-key]])
+   [lotuc.quartz.util.protocols :as p])
   (:import
-   [org.quartz JobKey TriggerKey]
+   [org.quartz JobKey Matcher TriggerKey]
    [org.quartz.impl.matchers
     AndMatcher
     EverythingMatcher
@@ -22,9 +22,10 @@
 (defn- make-fn-matcher [match-fn & [scope]]
   (reify org.quartz.Matcher
     (^boolean isMatch [_ ^org.quartz.utils.Key k]
-      (and (cond (= scope :job) (instance? JobKey k)
-                 (= scope :trigger) (instance? TriggerKey k)
-                 :else (nil? scope))
+      (and (case scope
+             :job (instance? JobKey k)
+             :trigger (instance? TriggerKey k)
+             (nil? scope))
            (match-fn (.getGroup k) (.getName k))))
     (equals [this other] (= this other))
     (hashCode [_] (hash [match-fn ::matcher]))))
@@ -54,9 +55,9 @@
   [spec]
   (cond
     (:fn spec) (make-fn-matcher (:fn spec) (:scope spec))
-    (:and spec) (reduce #(AndMatcher/and (matcher %1) (matcher %2)) (:and spec))
-    (:or spec) (reduce #(OrMatcher/or (matcher %1) (matcher %2)) (:or spec))
-    (:not spec) (NotMatcher/not (matcher (:not spec)))
+    (:and spec) (reduce #(AndMatcher/and (p/->matcher %1) (p/->matcher %2)) (:and spec))
+    (:or spec) (reduce #(OrMatcher/or (p/->matcher %1) (p/->matcher %2)) (:or spec))
+    (:not spec) (NotMatcher/not (p/->matcher (:not spec)))
     (:group spec) (let [s (second (:group spec))]
                     (case (first (:group spec))
                       :contains (GroupMatcher/groupContains s)
@@ -70,7 +71,22 @@
                      :equals (NameMatcher/nameEquals s)
                      :starts-with (NameMatcher/nameStartsWith s)))
     (:key spec) (KeyMatcher/keyEquals (case (:scope spec)
-                                        :job (job-key (:key spec))
-                                        :trigger (trigger-key (:key spec))
-                                        (generic-key (:key spec))))
+                                        :job (p/->job-key (:key spec))
+                                        :trigger (p/->trigger-key (:key spec))
+                                        (p/->key (:key spec))))
     (= :everything spec) (EverythingMatcher/allJobs)))
+
+(extend-protocol p/->Matcher
+  clojure.lang.PersistentArrayMap
+  (->matcher [this] (matcher this))
+
+  Matcher
+  (->matcher [this] this)
+
+  clojure.lang.PersistentVector
+  (->matcher [v] (p/->matcher {:and v})))
+
+(comment
+  (p/->matcher [{:name [:contains "abc"]}
+                {:group [:starts-with "abc"]}
+                {:fn (fn [group name] (contains? group name))}]))

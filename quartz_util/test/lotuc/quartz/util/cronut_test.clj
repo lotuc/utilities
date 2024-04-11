@@ -1,7 +1,9 @@
 (ns lotuc.quartz.util.cronut-test
-  (:require [clojure.test :refer [deftest is]]
-            [lotuc.quartz.util.cronut :as cronut])
-  (:import [java.util TimeZone]))
+  (:require
+   [clojure.test :refer [deftest is]]
+   [lotuc.quartz.util.cronut :as cronut])
+  (:import
+   [java.util TimeZone]))
 
 ;; MIT License
 ;;

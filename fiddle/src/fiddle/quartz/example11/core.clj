@@ -1,7 +1,11 @@
 (ns fiddle.quartz.example11.core
   (:import
    [java.util Date]
-   [org.quartz DateBuilder DateBuilder$IntervalUnit JobBuilder TriggerBuilder]
+   [org.quartz
+    DateBuilder
+    DateBuilder$IntervalUnit
+    JobBuilder
+    TriggerBuilder]
    [org.quartz.impl StdSchedulerFactory]))
 
 ;;; https://github.com/quartz-scheduler/quartz/tree/main/examples/src/main/java/org/quartz/examples/example11

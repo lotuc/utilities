@@ -1,13 +1,13 @@
 (ns lotuc.quartz.util.cronut
   (:require
-   [lotuc.quartz.util.key :refer [trigger-key]])
+   [lotuc.quartz.util.protocols :as p])
   (:import
    [java.util TimeZone]
    [org.quartz
     CronScheduleBuilder
     SimpleScheduleBuilder
-    TriggerBuilder
-    TriggerKey]))
+    Trigger
+    TriggerBuilder]))
 
 ;; MIT License
 ;;
@@ -38,7 +38,7 @@
   "Provide a base trigger-builder from configuration"
   [{:keys [key description start end priority]}]
   (cond-> (TriggerBuilder/newTrigger)
-    key (.withIdentity ^TriggerKey (trigger-key key))
+    key (.withIdentity (p/->trigger-key key))
     description (.withDescription description)
     start (.startAt start)
     (nil? start) (.startNow)
@@ -114,3 +114,13 @@
   {'cronut/trigger  lotuc.quartz.util.cronut/trigger-builder
    'cronut/cron     lotuc.quartz.util.cronut/shortcut-cron
    'cronut/interval lotuc.quartz.util.cronut/shortcut-interval})
+
+(extend-protocol p/->Trigger
+  Trigger
+  (->trigger [this] this)
+
+  TriggerBuilder
+  (->trigger [this] (.build this))
+
+  clojure.lang.PersistentArrayMap
+  (->trigger [spec] (p/->trigger (trigger-builder spec))))

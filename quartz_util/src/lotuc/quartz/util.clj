@@ -1,108 +1,77 @@
 (ns lotuc.quartz.util
   (:require
-   [lotuc.quartz.util.cronut :as cronut]
-   [lotuc.quartz.util.job :as util.job]
+   [lotuc.quartz.util.cronut]
+   [lotuc.quartz.util.jdbc :as jdbc]
+   [lotuc.quartz.util.job]
+   [lotuc.quartz.util.key]
    [lotuc.quartz.util.listener :as util.listener]
+   [lotuc.quartz.util.protocols :as p]
    [lotuc.quartz.util.scheduler :as util.scheduler]
-   [lotuc.quartz.util.twarc :as twarc])
-  (:import
-   [org.quartz
-    Job
-    JobBuilder
-    JobKey
-    JobListener
-    Matcher
-    Scheduler
-    SchedulerListener
-    Trigger
-    TriggerBuilder
-    TriggerKey
-    TriggerListener]))
+   [lotuc.quartz.util.twarc]
+   [lotuc.quartz.util.unsafe :as util.unsafe]))
 
 (set! *warn-on-reflection* true)
 
-(defn trigger-builder [config]
-  (cronut/trigger-builder config))
+(defn job-key ^org.quartz.JobKey [k]
+  (p/->job-key k))
 
-(defn build-trigger [v]
-  {:pre [(or (map? v) (instance? TriggerBuilder v) (instance? Trigger v))]}
-  (cond (map? v) (.build ^TriggerBuilder (trigger-builder v))
-        (instance? TriggerBuilder v) (.build ^TriggerBuilder v)
-        :else v))
+(defn trigger-key ^org.quartz.TriggerKey [k]
+  (p/->trigger-key k))
 
-(defn build-job [v]
-  {:pre [(or (map? v) (instance? JobBuilder v) (instance? Job v))]}
-  (cond (map? v) (.build ^JobBuilder (util.job/job-builder v))
-        (instance? JobBuilder v) (.build ^JobBuilder v)
-        :else v))
+(defn build-trigger ^org.quartz.Trigger [spec]
+  (p/->trigger spec))
 
-(defn job-key [k]
-  (cond (string? k) (JobKey. k)
-        (vector? k) (JobKey. (first k) (second k))
-        :else (do (assert (instance? JobKey k)) k)))
+(defn build-job ^org.quartz.Job [spec]
+  (p/->job spec))
 
-(defn trigger-key [k]
-  (cond (string? k) (TriggerKey. k)
-        (vector? k) (TriggerKey. (first k) (second k))
-        :else (do (assert (instance? TriggerKey k)) k)))
+(defn build-listener [spec]
+  (p/->listener spec))
+
+(defn build-matcher ^org.quartz.Matcher [spec]
+  (p/->matcher spec))
+
+(defn make-scheduler
+  (^org.quartz.Scheduler [] (util.scheduler/make-scheduler))
+  (^org.quartz.Scheduler [properties] (util.scheduler/make-scheduler properties)))
 
 (defn schedule-job
-  [^Scheduler scheduler job trigger]
-  (let [job (build-job job)
+  [scheduler job trigger]
+  (let [scheduler (p/get-scheduler scheduler)
+        job (build-job job)
         trigger (build-trigger trigger)]
     (.scheduleJob scheduler job trigger)))
 
-(defn delete-job [^Scheduler scheduler key]
-  (.deleteJob scheduler (job-key key)))
+(defn trigger-job
+  [scheduler key]
+  (.triggerJob (p/get-scheduler scheduler) (p/->job-key key)))
 
-(defn check-job-exists [^Scheduler scheduler key]
-  (.checkExists scheduler ^JobKey (job-key key)))
+(defn signal-scheduling-change
+  [scheduler]
+  (util.unsafe/signal-scheduling-change scheduler))
 
-(defn check-trigger-exists [^Scheduler scheduler key]
-  (.checkExists scheduler ^TriggerKey (trigger-key key)))
+(defn delete-job [scheduler key]
+  (.deleteJob (p/get-scheduler scheduler) (p/->job-key key)))
 
-(defn make-scheduler
-  ([] (util.scheduler/make-scheduler {}))
-  ([properties] (util.scheduler/make-scheduler properties {}))
-  ([properties options] (util.scheduler/make-scheduler properties options)))
+(defn check-job-exists [scheduler key]
+  (.checkExists (p/get-scheduler scheduler) (p/->job-key key)))
 
-(defn build-matcher ^Matcher [spec]
-  (if (instance? Matcher spec) spec (twarc/matcher spec)))
-
-(defn build-listener [spec]
-  {:pre [(or (map? spec)
-             (instance? JobListener spec)
-             (instance? TriggerListener spec)
-             (instance? SchedulerListener spec))]}
-  (if (map? spec) (util.listener/make-listener spec) spec))
+(defn check-trigger-exists [scheduler key]
+  (.checkExists (p/get-scheduler scheduler) (p/->trigger-key key)))
 
 (defn add-listener
-  ([^Scheduler scheduler {:keys [scope matcher] :as listener-spec}]
-   {:pre [(#{:job :trigger :scheduler} scope)]}
-   (if (= :scheduler scope)
-     (add-listener scheduler :scheduler listener-spec)
+  ([listener-manager-gettable {:keys [scope matcher] :as listener}]
+   (add-listener listener-manager-gettable listener matcher))
+  ([listener-manager-gettable listener matcher]
+   (let [m (p/get-listener-manager listener-manager-gettable)]
      (if matcher
-       (add-listener scheduler scope listener-spec matcher)
-       (add-listener scheduler scope listener-spec))))
-  ([^Scheduler scheduler listener-scope listener]
-   {:pre [(#{:job :trigger :scheduler} listener-scope)]}
-   (let [m (.getListenerManager scheduler)
-         l (build-listener listener)]
-     (case listener-scope
-       :job (.addJobListener m ^JobListener l)
-       :trigger (.addTriggerListener m ^TriggerListener l)
-       :scheduler (.addSchedulerListener m ^SchedulerListener l))
-     l))
-  ([^Scheduler scheduler listener-scope listener matcher]
-   {:pre [(#{:job :trigger} listener-scope)]}
-   (let [m (.getListenerManager scheduler)
-         l (build-listener listener)]
-     (if (sequential? matcher)
-       (let [^java.util.List matchers (map build-matcher listener)]
-         (case listener-scope
-           :job (.addJobListener m ^JobListener l matchers)
-           :trigger (.addTriggerListener m ^TriggerListener l matchers)))
-       (let [^Matcher matcher' (build-matcher matcher)]
-         (case listener-scope
-           :job (.addJobListener m ^JobListener l matcher')
-           :trigger (.addTriggerListener m ^TriggerListener l matcher')))))))
+       (util.listener/add-listener m listener matcher)
+       (util.listener/add-listener m listener)))))
+
+(defn with-connection
+  "Run scheduler operations with a managed connection."
+  [^java.sql.Connection conn f]
+  (binding [jdbc/*connection* conn]
+    (f)))
+
+(defn add-connection-provider [name get-connection]
+  (jdbc/add-connection-provider name get-connection))

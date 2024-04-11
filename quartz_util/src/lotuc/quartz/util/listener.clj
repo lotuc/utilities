@@ -1,6 +1,16 @@
 (ns lotuc.quartz.util.listener
+  (:require
+   [lotuc.quartz.util.protocols :as p])
   (:import
    [org.quartz JobListener SchedulerListener TriggerListener]))
+
+(extend-protocol p/GetListenerManager
+  org.quartz.Scheduler
+  (get-listener-manager [scheduler]
+    (.getListenerManager scheduler))
+
+  org.quartz.JobExecutionContext
+  (get-scheduler [this] (.getListenerManager (.getScheduler this))))
 
 (defmulti make-listener :scope)
 
@@ -85,3 +95,24 @@
       (listener-fn {:type :scheduler-shuttingdown}))
     (schedulingDataCleared [_]
       (listener-fn {:type :scheduling-data-cleared}))))
+
+(defn- add-listener*
+  ([^org.quartz.ListenerManager m listener]
+   (cond
+     (instance? JobListener listener) (.addJobListener m ^JobListener listener)
+     (instance? TriggerListener listener) (.addTriggerListener m ^TriggerListener listener)
+     (instance? SchedulerListener listener) (.addSchedulerListener m ^SchedulerListener listener)
+     :else (throw (ex-info (str "unkown listener: " listener) {:listener listener}))))
+  ([^org.quartz.ListenerManager m listener ^org.quartz.Matcher matcher]
+   (cond
+     (instance? JobListener listener) (.addJobListener m ^JobListener listener matcher)
+     (instance? TriggerListener listener) (.addTriggerListener m ^TriggerListener listener matcher)
+     :else (throw (ex-info (str "unkown listener: " listener) {:listener listener})))))
+
+(defn add-listener
+  [^org.quartz.ListenerManager m listener & [matcher :as args]]
+  (if (map? listener)
+    (apply add-listener m (make-listener listener) args)
+    (if matcher
+      (add-listener* m listener (p/->matcher matcher))
+      (add-listener* m listener))))
