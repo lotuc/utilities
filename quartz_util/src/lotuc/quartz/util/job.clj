@@ -55,7 +55,9 @@
                    ;; the merged job data map is not updated on refire execution
                    (.. ctx (getJobDetail) (getJobDataMap)))
         f (.. ctx (getJobDetail) (getJobDataMap) (get "fn"))
-        f' (resolve (symbol f))
+        f' (try (resolve (symbol f))
+                (catch Exception _
+                  (throw (JobExecutionException. (str "cannot resolve function: [" f "]")))))
         d (-> data-map
               (cnv/from-job-data)
               (dissoc "fn"))
