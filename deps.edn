@@ -1,9 +1,8 @@
 {:paths ["fiddle/src" "fiddle/resources" "classes"
          "ring-web/src" "ring-web/resources" "ring-web/test"
-         "ioc_macros/src" "ioc_macros/resources" "ioc_macros/test"
-
-         ;; cd into quartz_util: clojure -T:build javac
-         "quartz_util/src" "quartz_util/test" "quartz_util/target/classes"]
+         "ioc-macros/src" "ioc-macros/resources" "ioc-macros/test"
+         ;; cd into quartz-util: clojure -T:build javac
+         "quartz-util/src" "quartz-util/test" "quartz-util/target/classes"]
  :deps {com.hyperfiddle/rcf {:mvn/version "20220926-202227"}
         com.lambdaisland/classpath {:mvn/version "0.5.48"}
         com.taoensso/encore {:mvn/version "3.88.0"}

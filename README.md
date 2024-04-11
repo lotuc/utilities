@@ -4,10 +4,10 @@
   - [Usage & Examples](./fiddle/src/fiddle/ring_web)
   - <img src="https://img.shields.io/clojars/v/org.lotuc/ring-web.svg"> <img src="https://img.shields.io/clojars/v/org.lotuc/ring-web.svg?include_prereleases">
 
-- [IoC Macros](./ioc_macros/README.md)
+- [IoC Macros](./ioc-macros/README.md)
   - [Usage & Examples](./fiddle/src/fiddle/ioc_macros)
 
-- [Quartz utilities](./quartz_util/README.md)
+- [Quartz utilities](./quartz-util/README.md)
   - [Usage & Examples](./fiddle/src/fiddle/quartz)
   - <img src="https://img.shields.io/clojars/v/org.lotuc/quartz-util.svg"> <img src="https://img.shields.io/clojars/v/org.lotuc/quartz-util.svg?include_prereleases">
 

@@ -30,7 +30,7 @@
     :resource-dirs ["resources"]
     :class-dir class-dir
     :basis (b/create-basis nil)
-    :scm {:url "https://github.com/lotuc/utilities/tree/main/quartz_util"
+    :scm {:url "https://github.com/lotuc/utilities/tree/main/quartz-util"
           :connection "scm:git:git://github.com/lotuc/utilities.git"
           :developerConnection "scm:git:ssh://git@github.com/lotuc/utilities.git"
           :tag (b/git-process {:git-args "rev-parse HEAD"})}})

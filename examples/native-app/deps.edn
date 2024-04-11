@@ -1,12 +1,11 @@
 {:paths ["src" "resources"]
  :deps {;; local development, change to published version
-        org.lotuc/ring-web {:local/root ".."}
-        org.lotuc/quartz-util {:local/root "../../quartz_util"}
+        org.lotuc/ring-web {:local/root "../../ring-web"}
+        org.lotuc/quartz-util {:local/root "../../quartz-util"}
         com.taoensso/encore {:mvn/version "3.88.0"}
         ring-cors/ring-cors {:mvn/version "0.1.13"}
         io.github.kit-clj/kit-http-kit {:mvn/version "1.0.3"}
         ch.qos.logback/logback-classic {:mvn/version "1.5.2"}}
-
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}}
           :ns-default build}}}
