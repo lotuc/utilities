@@ -1,5 +1,6 @@
 (ns lotuc.quartz.util.cronut
   (:require
+   [lotuc.quartz.util.conversion :as cnv]
    [lotuc.quartz.util.protocols :as p])
   (:import
    [java.util TimeZone]
@@ -36,12 +37,13 @@
 
 (defn base-trigger-builder
   "Provide a base trigger-builder from configuration"
-  [{:keys [key description start end priority]}]
+  [{:keys [key description start end priority data-map]}]
   (cond-> (TriggerBuilder/newTrigger)
     key (.withIdentity (p/->trigger-key key))
     description (.withDescription description)
     start (.startAt start)
     (nil? start) (.startNow)
+    data-map (.usingJobData (cnv/to-job-data data-map))
     end (.endAt end)
     priority (.withPriority (int priority))))
 

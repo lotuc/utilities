@@ -1,5 +1,6 @@
 (ns lotuc.quartz.util
   (:require
+   [lotuc.quartz.util.conversion :as cnv]
    [lotuc.quartz.util.cronut]
    [lotuc.quartz.util.jdbc :as jdbc]
    [lotuc.quartz.util.job]
@@ -42,8 +43,10 @@
     (.scheduleJob scheduler job trigger)))
 
 (defn trigger-job
-  [scheduler key]
-  (.triggerJob (p/get-scheduler scheduler) (p/->job-key key)))
+  ([scheduler key]
+   (.triggerJob (p/get-scheduler scheduler) (p/->job-key key)))
+  ([scheduler key data-map]
+   (.triggerJob (p/get-scheduler scheduler) (p/->job-key key) (cnv/to-job-data data-map))))
 
 (defn signal-scheduling-change
   [scheduler]
