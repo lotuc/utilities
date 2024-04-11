@@ -15,6 +15,10 @@
   (println "\nclean target/")
   (b/delete {:path "target"}))
 
+(defn javac [_]
+  (b/javac {:src-dirs ["src-java"] :class-dir class-dir
+            :javac-opts ["-proc:full"]}))
+
 (defn jar [_]
   (println "\nwriting pom ...")
   (b/write-pom
@@ -30,6 +34,7 @@
           :connection "scm:git:git://github.com/lotuc/utilities.git"
           :developerConnection "scm:git:ssh://git@github.com/lotuc/utilities.git"
           :tag (b/git-process {:git-args "rev-parse HEAD"})}})
+
   (io/copy (io/file pom-file) (io/file "pom.xml"))
 
   (println "\ncopy source & resources ...")
@@ -42,6 +47,8 @@
                :or {installer :local}
                :as _}]
   (clean _)
+
+  (javac _)
 
   (jar _)
 
