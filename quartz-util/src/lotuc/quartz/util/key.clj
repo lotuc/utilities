@@ -7,6 +7,11 @@
 
 (set! *warn-on-reflection* true)
 
+(defn- keyword->key [f k]
+  (if-some [g (namespace k)]
+    (f [g (name k)])
+    (f (name k))))
+
 (extend-protocol p/->Key
   JobKey
   (->trigger-key [k] (throw (ex-info "unsupported" {:key k})))
@@ -27,6 +32,11 @@
   (->trigger-key [k] (TriggerKey. k))
   (->job-key [k] (JobKey. k))
   (->key [k] (throw (ex-info "unsupported" {:key k})))
+
+  clojure.lang.Keyword
+  (->trigger-key [k] (keyword->key p/->trigger-key k))
+  (->job-key [k] (keyword->key p/->job-key k))
+  (->key [k] (keyword->key p/->key k))
 
   ;; [group name]
   clojure.lang.PersistentVector
