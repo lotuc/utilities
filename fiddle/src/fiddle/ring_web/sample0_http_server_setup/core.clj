@@ -19,7 +19,7 @@
   (integrant.repl/go)
 
   ;; Swagger doc
-  ;; - http://localhost:4242/api-doc/index.html
+  ;; - http://localhost:4242/api-docs/index.html
 
   ;; Checkout this API
   ;; - curl http://localhost:4242/api/health
