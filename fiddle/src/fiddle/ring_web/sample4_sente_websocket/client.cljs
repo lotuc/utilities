@@ -46,24 +46,24 @@
 
 (def setup-sente-conn
   (m/sp
-   (js/console.info :setup-session (m/? setup-session!))
-   (let [conn (->> {:type :auto
-                    :packer :edn :port 4242
-                    :params {:authorization "42"}
-                    :ajax-opts {:headers {"Authorization" "42"}}}
-                   (sente/make-channel-socket-client! "/api/chsk" nil))]
-     (when-some [ch-recv (:ch-recv conn)]
-       (sente/start-chsk-router! ch-recv event-msg-handler))
-     (reset! sente-conn conn))))
+    (js/console.info :setup-session (m/? setup-session!))
+    (let [conn (->> {:type :auto
+                     :packer :edn :port 4242
+                     :params {:authorization "42"}
+                     :ajax-opts {:headers {"Authorization" "42"}}}
+                    (sente/make-channel-socket-client! "/api/chsk" nil))]
+      (when-some [ch-recv (:ch-recv conn)]
+        (sente/start-chsk-router! ch-recv event-msg-handler))
+      (reset! sente-conn conn))))
 
 (js/Promise. setup-sente-conn)
 
 (comment
   (js/Promise.
    (m/sp
-    (let [evt [:a/ping 42]]
-      (js/console.info :>send evt)
-      (js/console.info :<recv (m/? (chsk-send! @sente-conn evt 1000))))))
+     (let [evt [:a/ping 42]]
+       (js/console.info :>send evt)
+       (js/console.info :<recv (m/? (chsk-send! @sente-conn evt 1000))))))
 
   @(:state @sente-conn)
 

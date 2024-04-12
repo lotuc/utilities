@@ -3,9 +3,9 @@
    [clojure.java.io :as io]
    [kit.edge.server.http-kit]
    [lotuc.ring-web.core :as core]
+   [lotuc.ring-web.quartz-tasks]
    [lotuc.ring-web.sente-server]
-   [ring.util.response :as response]
-   [lotuc.ring-web.quartz-tasks])
+   [ring.util.response :as response])
   (:gen-class))
 
 ;;; handling swagger static resources.

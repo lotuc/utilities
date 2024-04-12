@@ -1,7 +1,7 @@
 (ns fiddle.ioc-macros.sample04-cloroutine
   (:require
-   [lotuc.clj.ioc-macros :as ioc]
-   [hyperfiddle.rcf :as rcf]))
+   [hyperfiddle.rcf :as rcf]
+   [lotuc.clj.ioc-macros :as ioc]))
 
 (def RESUME-IDX ioc/USER-START-IDX)
 (def num-user-params 1)

@@ -1,7 +1,7 @@
 (ns lotuc.ring-web.quartz-tasks
   (:require
-   [lotuc.quartz.util :as qu]
-   [integrant.core :as ig])
+   [integrant.core :as ig]
+   [lotuc.quartz.util :as qu])
   (:import
    [java.util Date]
    [org.quartz JobExecutionContext]))

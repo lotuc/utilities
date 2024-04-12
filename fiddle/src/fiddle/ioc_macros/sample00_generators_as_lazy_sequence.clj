@@ -1,7 +1,7 @@
 (ns fiddle.ioc-macros.sample00-generators-as-lazy-sequence
   (:require
-   [lotuc.clj.ioc-macros :as ioc]
-   [hyperfiddle.rcf :as rcf]))
+   [hyperfiddle.rcf :as rcf]
+   [lotuc.clj.ioc-macros :as ioc]))
 
 ;;; https://github.com/leonoel/cloroutine/blob/master/doc/01-generators.md
 

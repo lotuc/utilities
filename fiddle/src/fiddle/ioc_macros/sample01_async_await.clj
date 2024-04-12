@@ -1,8 +1,8 @@
 (ns fiddle.ioc-macros.sample01-async-await
   (:refer-clojure :exclude [await])
   (:require
-   [lotuc.clj.ioc-macros :as ioc]
-   [hyperfiddle.rcf :as rcf])
+   [hyperfiddle.rcf :as rcf]
+   [lotuc.clj.ioc-macros :as ioc])
   (:import
    [java.util.concurrent CompletableFuture]))
 
