@@ -15,6 +15,16 @@
 
  :quartz/scheduler {}
 
+ :db.sql/hikari-ds
+ {:dbtype "mysql"
+  :jdbcUrl  "jdbc:mysql://localhost:3306/quartz?allowMultiQueries=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8"
+  :username "quartz"
+  :password "quartz"}
+
+ :reitit.routes.api/quartz
+ {:db #ig/ref :db.sql/hikari-ds
+  :base-path ""}
+
  :server/http-kit
  {:port #long #or [#env PORT 4242]
   :host #or [#env HTTP_HOST]

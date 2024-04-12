@@ -29,8 +29,12 @@
         dir (.getParent (io/file native-app-jar))
         cmd-args ["native-image" "-jar" (.getName f)
                   "--initialize-at-build-time=ch.qos.logback"
+                  "--initialize-at-build-time=com.zaxxer.hikari.HikariConfig"
+                  "--initialize-at-build-time=com.zaxxer.hikari.HikariDataSource"
                   "-H:IncludeResources=native_app.edn"
-                  "--no-fallback"]]
+                  "-H:IncludeResources=ring-web-common.edn"
+                  "--no-fallback"
+                  "--trace-class-initialization=com.zaxxer.hikari.HikariConfig"]]
     (when-not (.exists f) (jar _))
     (println)
     (println cmd-args "...")

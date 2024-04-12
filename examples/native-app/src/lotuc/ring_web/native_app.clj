@@ -3,6 +3,7 @@
    [clojure.java.io :as io]
    [kit.edge.server.http-kit]
    [lotuc.ring-web.core :as core]
+   [lotuc.ring-web.db]
    [lotuc.ring-web.quartz-tasks]
    [lotuc.ring-web.sente-server]
    [ring.util.response :as response])
@@ -17,3 +18,10 @@
 
 (defn -main [& _args]
   (core/start-app (io/resource "native_app.edn") {:profile :prod}))
+
+(comment
+  (do (require '[integrant.repl])
+      (integrant.repl/set-prep!
+       #(core/system-config
+         (io/resource "native_app.edn")
+         {:profile :dev}))))
